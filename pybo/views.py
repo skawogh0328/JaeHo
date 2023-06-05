@@ -4,6 +4,7 @@ from .models import Question
 from .forms import QuestionForm, AnswerForm
 from django.core.paginator import Paginator
 from django.contrib.auth.decorators import login_required
+from pybo import models
 
 def index(request):
     page = request.GET.get('page', '1')  # 페이지
@@ -38,7 +39,7 @@ def answer_create(request, question_id):
 
 def question_create(request):
     if request.method == 'POST':
-        form = QuestionForm(request.POST)
+        form = QuestionForm(request.POST, request.FILES)
         if form.is_valid():
             question = form.save(commit=False)
             question.author = request.user  # author 속성에 로그인 계정 저장
@@ -46,6 +47,8 @@ def question_create(request):
             question.save()
             return redirect('pybo:index')
     else:
-        form = QuestionForm()
+        form = QuestionForm(request.POST, request.FILES)
     context = {'form': form}
     return render(request, 'pybo/question_form.html', context)
+
+
